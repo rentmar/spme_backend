@@ -136,12 +136,25 @@ class InstanciaGestora(models.Model):
         return f"{self.codigo} - {self.instancia}"    
 
 
+#Registrar Procedencia de fondos
+class ProcedenciaFondos(models.Model):
+    sigla = models.CharField(max_length=15, null=True, blank=True)
+    financiera = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Procedencia de Fondos'
+        verbose_name_plural = 'Procedencia de Fondos'
+
+    def __str__(self):
+        return f"{self.sigla} - {self.financiera}"    
+
 #Definicion de la clase Proyecto
 class Proyecto(models.Model):
     ESTADO_OPCIONES = [
         ('ES','Estructuracion'),
         ('EP','En Planificacion'),
     ]
+
     #Informacion basica
     codigo = models.CharField(max_length=50, unique=True)
     titulo = models.CharField(max_length=500)
@@ -168,6 +181,14 @@ class Proyecto(models.Model):
         on_delete=models.PROTECT,
         related_name='proyectos', #Nombre para la relacion inversa
         verbose_name='PEI asociado',
+    )
+
+    procedencia_fondos = models.ManyToManyField(
+        ProcedenciaFondos,
+        blank=True,
+        related_name='procedencia_fondos',
+        verbose_name='Financiador(es) proyecto',
+        help_text='Financiador(es) del proyecto'
     )
 
     class Meta:
@@ -352,6 +373,33 @@ class ProductoResultadoOE(ProductoProyecto):
         verbose_name = 'Producto del Resultado Objetivo Especifico'
         verbose_name_plural = 'Productos del Resultado Objetivo Especifico'
 
+#PRoducto vinculado a todos los nodos
+class ProductoGeneral(ProductoProyecto):
+    #relaciones
+    objetivo_general = models.ForeignKey(
+        ObjetivoGeneralProyecto, 
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='productos_generales_og',
+        verbose_name='Producto general asociado a Objetivo General',
+        help_text='Producto que puede asociarse a todos los nodos',
+    )
+    objetivo_especifico = models.ForeignKey(
+        ObjetivoEspecificoProyecto,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True, 
+        related_name='productos_generales_oe',
+        verbose_name='Producto general asociado a objetivo especifico',
+        help_text='Producto que puede asociarse a todos los nodos',
+    )
+
+    #relaciones
+    class Meta:
+        verbose_name = 'Producto general (a toda la estructura)'
+        verbose_name_plural = 'Productos generales (a toda la estructura)'
+
 
     
 #Indicadores
@@ -497,7 +545,7 @@ class Proceso(models.Model):
     titulo = models.CharField(max_length=255, null=True, blank=True)
     descripcion = models.TextField(blank=True, null=True)
     #Relaciones
-    resultado_og = models.OneToOneField(
+    resultado_og = models.ForeignKey(
         ResultadoOG,
         on_delete=models.SET_NULL,
         null=True,
@@ -507,7 +555,7 @@ class Proceso(models.Model):
         help_text='Procesos que se ejecutan para alcanzar el Resultado OG'
     )
 
-    resultado_oe = models.OneToOneField(
+    resultado_oe = models.ForeignKey(
         ResultadoOE,
         on_delete=models.SET_NULL,
         null=True,
@@ -517,7 +565,7 @@ class Proceso(models.Model):
         help_text='Procesos que se ejecutan para alcanzar el Resultado OE',
     )
 
-    producto_oe = models.OneToOneField(
+    producto_oe = models.ForeignKey(
         ProductoOE,
         on_delete=models.SET_NULL,
         null=True,

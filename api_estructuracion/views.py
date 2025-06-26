@@ -126,6 +126,11 @@ class ProyInstGestoraViewModel(viewsets.ModelViewSet):
     queryset = InstanciaGestora.objects.all()
     serializer_class = ProyInsGestSer
 
+#Endpoint tipo Model: Procedencia de Fondos
+class ProcedenciaFondosViewmodel(viewsets.ModelViewSet):
+    queryset = ProcedenciaFondos.objects.all()
+    serializer_class = ProcedenciaFondosSerializer    
+
 #Vista para los proyectos en estado de planificacion
 class ProyectoPlanificacionView(generics.ListAPIView):
     serializer_class = ProyectoPlanificacionSerializer
@@ -230,6 +235,11 @@ class IndicadorResultadoOEViewset(viewsets.ModelViewSet):
 class ProductoResultadoOEViewset(viewsets.ModelViewSet):
     queryset = ProductoResultadoOE.objects.all()
     serializer_class = ProductoResultadoOESer
+
+#Vista - Producto General
+class ProductoGeneralViewset(viewsets.ModelViewSet):
+    queryset = ProductoGeneral.objects.all()
+    serializer_class = ProductoGeneralSerializer    
 
 #Vista - Proceso
 class ProcesoViewset(viewsets.ModelViewSet):

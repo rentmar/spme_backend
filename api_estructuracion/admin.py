@@ -34,7 +34,9 @@ admin.site.register(ResultadoOG)
 admin.site.register(ResultadoOE)
 admin.site.register(ProductoOE)
 admin.site.register(ProductoResultadoOE)
+admin.site.register(ProductoGeneral)
 admin.site.register(Actividad)
+admin.site.register(ProcedenciaFondos)
 
 #INdicador de Objetivo Especifico
 @admin.register(IndicadorProyecto)

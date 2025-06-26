@@ -30,8 +30,10 @@ router.register(r'resultado-og', ResultadoObjetivoGeneralViewset, basename="resu
 router.register(r'resultado-oe', ResultadoObjetivoEspecificoViewset, basename="resultado_obj_espec")
 router.register(r'producto-oe', ProductoOEViewset, basename='producto_obj_espec')
 router.register(r'producto-result-oe', ProductoResultadoOEViewset, basename='producto_res_oe')
+router.register(r'producto-general', ProductoGeneralViewset, basename='producto_general')
 router.register(r'procesos', ProcesoViewset, basename='procesos')
 router.register(r'actividades', ActividadViewset, basename='actividades')
+router.register(r'procedencia-fondos', ProcedenciaFondosViewmodel, basename='procedencia_fondos')
 #Indicadores del objetivo
 
 #router.register(r'indicadores-numericos', IndicadorNumericoViewSet, basename='indicador-numerico')

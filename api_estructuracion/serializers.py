@@ -200,6 +200,13 @@ class ProyInsGestSer(serializers.ModelSerializer):
         model = InstanciaGestora
         fields = '__all__'     
 
+
+#Serializador Model: ProcedenciaFondos
+class ProcedenciaFondosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProcedenciaFondos
+        fields = '__all__'     
+
 #Serializador Model: DiagramaEstructura
 class DiagramaEstructuraSer(serializers.ModelSerializer):
     class Meta:
@@ -286,6 +293,12 @@ class IndicadorResultadoOESer(serializers.ModelSerializer):
 class ProductoResultadoOESer(serializers.ModelSerializer):
     class Meta:
         model = ProductoResultadoOE
+        fields = '__all__'
+
+#Serializador para el Producto General
+class ProductoGeneralSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductoGeneral
         fields = '__all__'
 
 #Serializador Proceso
