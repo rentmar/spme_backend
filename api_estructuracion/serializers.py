@@ -15,6 +15,12 @@ class ObjetivoPeiSerializaer(serializers.ModelSerializer):
         model = ObjetivoPei
         fields = '__all__'        
 
+#Serializador Model Factores criticos PEI
+class FactoresCriticosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FactoresCriticos
+        fields = '__all__'        
+
 ######################### SERIALIZADORES INDICADORES PEI #################################
 
 #Serializador Indicador Cuantitativo PEI
@@ -103,11 +109,14 @@ class ProyectoDatosSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         instancia_gestora_data = validated_data.pop('instancia_gestora', [])
+        procedencia_fondos_data = validated_data.pop('procedencia_fondos', [])
         # Crear proyecto sin el campo M2M
         proyecto = Proyecto.objects.create(**validated_data)
         # Asignar M2M después
         if instancia_gestora_data:
             proyecto.instancia_gestora.set(instancia_gestora_data)
+        if procedencia_fondos_data:
+            proyecto.procedencia_fondos.set(procedencia_fondos_data)    
 
         # Crear nodo para DiagramaEstructura con info actualizada
         nodo = {
@@ -153,7 +162,8 @@ class ProyectoDatosSerializer(serializers.ModelSerializer):
                     "estado": proyecto.estado,
                     "creado_por": str(proyecto.creado_por),
                     "pei": proyecto.pei_id,
-                    "instancia_gestora": list(proyecto.instancia_gestora.values_list('id', flat=True))
+                    "instancia_gestora": list(proyecto.instancia_gestora.values_list('id', flat=True)),
+                    "procedencia_fondos": list(proyecto.procedencia_fondos.values_list('id', flat=True))
                 }
             },
             "events": {}
@@ -315,137 +325,139 @@ class ActividadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 ############################################## ESTRUCTURA COMPLETA DEL PROYECTO   #####################################################
-#Procesos serializador
-class ProcesosSer(serializers.ModelSerializer):
+# Serializador KPI
+class KpiSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Proceso
+        model = Kpi
         fields = '__all__'
 
+class IndicadorOgSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IndicadorObjetivoGeneral
+        fields = '__all__'
 
-#Actividades Serializado
-class ActividadesSer(serializers.ModelSerializer):
+class IndicadorResultadoOgSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IndicadorResultadoObjGral
+        fields = '__all__'
 
+class ActividadSer(serializers.ModelSerializer):
     class Meta:
         model = Actividad
         fields = '__all__'
 
-
-class ProcesoActividadSerializer(serializers.ModelSerializer):
-    actividades = ActividadesSer(many=True, source='actividad_proceso')
-    
+class ProcesoSerializer(serializers.ModelSerializer):
+    actividades = ActividadSer(many=True, source='actividad_proceso.all')
     class Meta:
         model = Proceso
-        fields = '__all__'
+        fields = '__all__'    
 
-
-# Indicador de Objetivo General
-class IndicadorObjetivoGeneralSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IndicadorObjetivoGeneral
-        fields = ['id', 'codigo', 'redaccion', 'baseline', 'target_q1', 'target_q2', 'target_q3', 'target_q4', 'objetivo_general']
-
-# KPI de Objetivo General
-class KpiSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Kpi
-        fields = ['id', 'codigo', 'descripcion']
-
-# Indicador de Resultado Objetivo General
-class IndicadorResultadoObjetivoGeneralSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IndicadorResultadoObjGral
-        fields = ['id', 'codigo', 'redaccion']
-
-#Resultado de Objetivo General junto con Indicator
-class ResultadoObjetivoGeneralSerializer(serializers.ModelSerializer):
-    indicador_res_objgral = IndicadorResultadoObjetivoGeneralSerializer(many=True, source='indicador_res_og', read_only=True)
-    procesos_res_objgral = ProcesoActividadSerializer(source='proceso_resultado_og')
-    actividades_res_objgral = ActividadesSer(many=True, source='actividad_resultado_og', read_only=True)
-
+class ResultadoOgSerializer(serializers.ModelSerializer):
+    indicador_res_og = IndicadorResultadoOgSerializer(many=True)
+    proceso_resultado_og = ProcesoSerializer(many=True)
+    actividad_resultado_og = ActividadSer(many=True)    
     class Meta:
         model = ResultadoOG
-        fields = ['id', 'codigo', 'descripcion', 'indicador_res_objgral', 'procesos_res_objgral', 'actividades_res_objgral']
+        fields = '__all__'    
 
-
-#Indicador Resultado Objetivo Especifico
-class IndicadorResultadoObjetivoEspecificoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IndicadorResultadoObjEspecifico
-        fields = '__all__'
-
-
-#Producto de Resultado Objetivo Especifico
-class ProductoResObjEspecificoSer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductoResultadoOE
-        fields = '__all__'
-
-
-#Resultado de Objetivo Especifico
-class ResultadoObjetivoEspecificoSerializer(serializers.ModelSerializer):
-    #Indicador de Resultado OE
-    indicadores_resultado_objesp = IndicadorResultadoObjetivoEspecificoSerializer(many=True, source='indicador_res_oe', read_only=True)
-    #Producto de Resultado OE
-    productos_resultado_objesp = ProductoResObjEspecificoSer(many=True, source='productos_res_oe', read_only=True) 
-    #Proceso para Resultado OE
-    proceso_resultado_objesp = ProcesoActividadSerializer(many=False, source='proceso_resultado_oe', read_only=True)
-    #Actividad para Resultado OE
-    actividades_resultado_objesp = ActividadesSer(many=True, source="actividad_resultado_oe", read_only=True )
-    
-    class Meta:
-        model = ResultadoOE
-        fields = '__all__'
-
-
-#Productos de Objetivo Especifico
-class ProductosOeSeria(serializers.ModelSerializer):
-    proceso_producto_objesp = ProcesoActividadSerializer(many=False, source='proceso_producto_oe', read_only=True)
-    actividades_producto_objesp = ActividadesSer(many=True, source='actividad_producto_oe', read_only=True)
-    class Meta:
-        model = ProductoOE
-        fields = '__all__'
-
-#Indicador de Objetivo Especifico
-class IndicadorOESeria(serializers.ModelSerializer):
+class IndicadorOeSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndicadorObjetivoEspecifico
         fields = '__all__'
 
+class IndicadorResultadoOeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IndicadorResultadoObjEspecifico
+        fields = '__all__'
 
-#Objetivo Especifico
-class ObjetivoEspecificoSeria(serializers.ModelSerializer):
-    #Indicador Objetivo Especifico
-    indicadores_objesp = IndicadorOESeria(many=True, source='indicador_oe', read_only= True)
-    #Producto de Objetivo Especifico
-    productos_objesp = ProductosOeSeria(many=True, source='productos_oe', read_only=True)
-    #Resultado de Objetivo Especifico
-    resultado_objesp = ResultadoObjetivoEspecificoSerializer(many=True, source='resultados_oe', read_only=True)
+class ProductoOeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductoOE
+        fields = '__all__'    
+
+class ResultadoOeSerializer(serializers.ModelSerializer):
+    indicador_res_oe = IndicadorResultadoOeSerializer(many=True)
+    productos_res_oe = ProductoOeSerializer(many=True)
+    proceso_resultado_oe = ProcesoSerializer(many=True)
+    actividad_resultado_oe = ActividadSerializer(many=True)    
+    class Meta:
+        model = ResultadoOE
+        fields = '__all__'
+
+class ProductoOeSerializer(serializers.ModelSerializer):
+    proceso_producto_oe = ProcesoSerializer(many=True)
+    actividad_producto_oe = ActividadSerializer(many=True)    
+    class Meta:
+        model = ProductoOE
+        fields = '__all__'     
+
+class ObjetivoEspecificoProySerializer(serializers.ModelSerializer):
+    indicador_oe = IndicadorOeSerializer(many=True)
+    resultados_oe = ResultadoOeSerializer(many=True)
+    productos_oe = ProductoOeSerializer(many=True)    
     class Meta:
         model = ObjetivoEspecificoProyecto
-        fields = '__all__' 
+        fields = '__all__'         
 
-
-# Objetivo General junto con kpi, indicador, resultado
-class ObjetivoGeneralSerializer(serializers.ModelSerializer):
-    kpi = KpiSerializer(many=True, source='kpis', read_only=True)
-    indicadores_objgral = IndicadorObjetivoGeneralSerializer(many=True, source='indicador_og', read_only=True)
-    resultados_objgral = ResultadoObjetivoGeneralSerializer(many=True, source='resultados_og', read_only=True)
-    #Objetivo Especifico relacionado al Objetivo General
-    objetivos_especificos = ObjetivoEspecificoSeria(many=True, source='objetivos_especificos_og', read_only=True)
-
+class ObjetivoGeneralProySerializer(serializers.ModelSerializer):
+    kpis = KpiSerializer(many=True)
+    indicador_og = IndicadorOgSerializer(many=True)
+    resultados_og = ResultadoOgSerializer(many=True)
+    objetivos_especificos_og = ObjetivoEspecificoProySerializer(many=True)    
     class Meta:
         model = ObjetivoGeneralProyecto
-        fields = ['id', 'codigo', 'descripcion', 'kpi', 'indicadores_objgral', 'resultados_objgral', 'objetivos_especificos']
+        fields = '__all__'
 
-# Estrcutura del proyecto
+# Estructura del proyecto
 class ProyectoEstructuraSerializer(serializers.ModelSerializer):
-    objetivo_general = ObjetivoGeneralSerializer()
-    objetivo_especifico = ObjetivoEspecificoSeria(many=True, source='objetivos_especificos', read_only=True)
-
+    objetivo_general = ObjetivoGeneralProySerializer()
+    objetivos_especificos = ObjetivoEspecificoProySerializer(many=True)
+    instancia_gestora = serializers.SlugRelatedField(many=True, read_only=True, slug_field='codigo')
+    procedencia_fondos = serializers.SlugRelatedField(many=True, read_only=True, slug_field='sigla')
     class Meta:
         model = Proyecto
-        fields = ['id', 'codigo', 'titulo', 'descripcion', 'objetivo_general', 'objetivo_especifico']
+        fields = [
+            'id', 'codigo', 'titulo', 'descripcion',
+            'fecha_creacion', 'fecha_inicio', 'fecha_finalizacion',  
+            'estado', 'presupuesto', 
+            'instancia_gestora', 'procedencia_fondos', 'objetivo_general', 'objetivos_especificos'
+            ]
 
 ############################################## FIN ESTRUCTURA COMPLETA DEL PROYECTO   #####################################################
 
+####################################   ESTRUCTURA DEL PEI  #######################################################
+class FactorCriticoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FactoresCriticos
+        fields = ['id', 'factor_critico']
 
+
+class IndicadorPeiSerializer(serializers.ModelSerializer):
+    tipo = serializers.SerializerMethodField()
+    class Meta:
+        model = IndicadorPeiBase
+        fields = ['id', 'codigo', 'descripcion', 'tipo', 'captura_informacion', 
+                 'responsabilidad', 'frecuencia_recopilacion', 'uso_informacion']
+
+    def get_tipo(self, obj):
+        return obj.polymorphic_ctype.model
+
+
+class ObjetivoPeiSerializer(serializers.ModelSerializer):
+    indicadores = IndicadorPeiSerializer(many=True, source='indicador_pei_objetivo')
+    factores_criticos = FactorCriticoSerializer(many=True)
+    class Meta:
+        model = ObjetivoPei
+        fields = ['id', 'codigo', 'descripcion', 'indicadores', 'factores_criticos']
+
+
+class PeiEstructuraSerializer(serializers.ModelSerializer):
+    objetivos = ObjetivoPeiSerializer(many=True, source='pei_obj_general')
+    class Meta:
+        model = Pei
+        fields = ['id', 'titulo', 'descripcion', 'fecha_creacion', 
+                 'fecha_inicio', 'fecha_fin', 'esta_vigente', 'objetivos']    
+
+
+
+####################################  FIN ESTRUCTURA DEL PEI  #######################################################

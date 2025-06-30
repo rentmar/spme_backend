@@ -10,6 +10,7 @@ router.register(r'indicadores', IndicadorPeiViewSet, basename='indicadores')
 router.register(r'objetivos-pei', ObjetivosPeiViewModel, basename='obj.pei')
 router.register(r'indicadores-cuantitativos', IndicadorPeiCuantitativoViewSet)
 router.register(r'indicadores-cualitativos', IndicadorPeiCualitativoViewSet)
+router.register(r'factores-criticos', FactoresCriticosView, basename='factores_criticos')
 
 
 
@@ -55,6 +56,7 @@ urlpatterns = [
     #path(r'proy-detalle/<int:pk>/', ProyectoDetalleView.as_view(), name='proy_detalle'),
     #path(r'proyecto-objesp-info/<int:id>/', ProyectoCompletoDetailView.as_view(), name='proyecto-obj-info'),
     path(r'pei/<int:pk>/objetivos/', PeiObjetivosIndicadoresView.as_view(), name='pei-objetivos'),
+    path(r'pei/estructura/<int:id>/', PeiEstructuraCompletaView.as_view(), name='pei-estructura'),
     path(r'pei-vigente/', obtener_pei_vigente, name='pei-vigente'),
     path(r'pei-vigente/<int:pei_id>/', establecer_pei_vigente, name='establecer-pei-vigente'),
     path(r'proyectos/planificacion/<int:pei_id>/', ProyectoPlanificacionView.as_view(), name='proyectos-planificacion'  ),

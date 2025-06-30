@@ -27,6 +27,12 @@ class ObjetivosPeiViewModel(viewsets.ModelViewSet):
     serializer_class = ObjetivoPeiSerializaer
 
 
+#Factores criticos
+class FactoresCriticosView(viewsets.ModelViewSet):
+    queryset = FactoresCriticos.objects.all()
+    serializer_class = FactoresCriticosSerializer
+
+
 ############################# INDICADORES PEI ###########################
 
 class IndicadorPeiViewSet(viewsets.ModelViewSet):  # Solo lectura, cambia a ModelViewSet si quieres CRUD
@@ -265,6 +271,23 @@ class ProyectosPlanificacionList(generics.ListAPIView):
     def get_queryset(self):
         # Filtra los proyectos con estado 'EP' (En Planificación)
         return Proyecto.objects.filter(estado='EP')    
+
+
+
+###############################  ESTRUCTURA DEL PEI   ########################################33
+class PeiEstructuraCompletaView(generics.RetrieveAPIView):
+    queryset = Pei.objects.all()
+    serializer_class = PeiEstructuraSerializer
+    lookup_field = 'id'
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response({
+            'PEI': serializer.data
+        })
+
+
 
 
 """

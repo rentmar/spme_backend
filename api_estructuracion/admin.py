@@ -6,6 +6,7 @@ from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModel
 #Pei
 admin.site.register(Pei)
 admin.site.register(ObjetivoPei)
+admin.site.register(FactoresCriticos)
 
 @admin.register(IndicadorPeiBase)
 class IndicadorAdmin(PolymorphicParentModelAdmin):
