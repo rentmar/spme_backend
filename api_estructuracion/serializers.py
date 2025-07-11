@@ -2,6 +2,7 @@ from .models import *
 from rest_framework import serializers
 from drf_polymorphic.serializers import PolymorphicSerializer
 
+
 ############################ PEI  ##########################################
 #Serializador Model PEI
 class PeiSerializer(serializers.ModelSerializer):
@@ -461,3 +462,102 @@ class PeiEstructuraSerializer(serializers.ModelSerializer):
 
 
 ####################################  FIN ESTRUCTURA DEL PEI  #######################################################
+
+################################CONTEOS#########################################################################
+
+#Serializador para el conteo de los proyectos
+from rest_framework import serializers
+
+class ConteosProyectoSerializer(serializers.Serializer):
+    # Objetivo General y sus elementos
+    objetivo_general = serializers.IntegerField()
+    kpi_objetivo_general = serializers.IntegerField()
+    indicador_objetivo_general = serializers.IntegerField()
+    producto_objetivo_general = serializers.IntegerField()
+    indicador_producto_objetivo_general = serializers.IntegerField()
+    
+    # Resultados del Objetivo General
+    resultado_objetivo_general = serializers.IntegerField()
+    indicador_resultado_objetivo_general = serializers.IntegerField()
+    proceso_resultado_objetivo_general = serializers.IntegerField()
+    actividad_resultado_objetivo_general = serializers.IntegerField()
+    
+    # Objetivos Específicos del Objetivo General
+    objetivo_especifico_og = serializers.IntegerField()
+    indicador_objetivo_especifico_og = serializers.IntegerField()
+    resultado_objetivo_especifico_og = serializers.IntegerField()
+    indicador_resultado_objetivo_especifico_og = serializers.IntegerField()
+    producto_objetivo_especifico_og = serializers.IntegerField()
+    proceso_producto_objetivo_especifico_og = serializers.IntegerField()
+    actividad_producto_objetivo_especifico_og = serializers.IntegerField()
+    
+    # Objetivos Específicos directos del Proyecto
+    objetivo_especifico_proyecto = serializers.IntegerField()
+    indicador_objetivo_especifico_proyecto = serializers.IntegerField()
+    producto_objetivo_especifico_proyecto = serializers.IntegerField()
+    indicador_producto_objetivo_especifico_proyecto = serializers.IntegerField()
+    resultado_objetivo_especifico_proyecto = serializers.IntegerField()
+    indicador_resultado_objetivo_especifico_proyecto = serializers.IntegerField()
+    
+#########################################  FIN CONTEOS #######################################################
+
+###################################  Lista de procesos de un proyecto  ######################33
+class ProcesoProyectoSerializer(serializers.ModelSerializer):
+    display_name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Proceso
+        fields = ['id', 'codigo', 'titulo', 'display_name']
+
+    def get_display_name(sel, obj):
+        return f"{obj.id} - {obj.codigo} - {obj.titulo}"   
+
+
+
+################################### Fin Lista de procesos de un proyecto  ######################
+
+######################### LISTA DE OBJETIVOS MINIMALISTA DEL PEI #############################3
+class SimpleObjetivoPeiSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ObjetivoPei
+        fields = ['id', 'codigo', 'descripcion']
+
+    def to_representation(self, instance):
+        return f"{instance.id}-{instance.codigo}-{instance.descripcion}"
+
+#############################################################################
+########################### Lista de Indicadores OE
+class IndicadorOeCompactoSerializer(serializers.ModelSerializer):
+    display = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = IndicadorObjetivoEspecifico
+        fields = ['display']
+    
+    def get_display(self, obj):
+        # Formato: id-codigo-redaccion
+        codigo = obj.codigo if obj.codigo else ''
+        redaccion = obj.redaccion if obj.redaccion else ''
+        return f"{obj.id}-{codigo}-{redaccion}".rstrip('-')
+
+########################### Fin  Lista de Indicadores OE
+##################################  LISTA DE ACTIVIDADES  #################################################3
+
+class ProcesoDropdownSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Proceso
+        fields = ['id', 'codigo', 'titulo']
+
+class ActividadDropdownSerializer(serializers.ModelSerializer):
+    proceso = ProcesoDropdownSerializer(read_only=True)
+    display_text = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Actividad
+        fields = ['id', 'codigo', 'descripcion', 'proceso', 'display_text']
+    
+    def get_display_text(self, obj):
+        return f"{obj.id} - {obj.codigo} - {obj.descripcion}"
+
+
+##################################  FIN LISTA DE ACTIVIDADES  #################################################3

@@ -35,20 +35,7 @@ router.register(r'producto-general', ProductoGeneralViewset, basename='producto_
 router.register(r'procesos', ProcesoViewset, basename='procesos')
 router.register(r'actividades', ActividadViewset, basename='actividades')
 router.register(r'procedencia-fondos', ProcedenciaFondosViewmodel, basename='procedencia_fondos')
-#Indicadores del objetivo
 
-#router.register(r'indicadores-numericos', IndicadorNumericoViewSet, basename='indicador-numerico')
-#router.register(r'indicadores-literales', IndicadorLiteralViewSet, basename='indicadores-literales')
-#router.register(r'indicadores-porcentuales', IndicadorPorcentualViewSet, basename='indicadores-porcentuales')
-#router.register(r'proyectos-completos', ProyectoCompletoView, basename='proyectos-completos') #Proyecto, con obj general e info relacionada
-
-#OBJETIVOS ESPECIFICOS
-#router.register(r'objetivos-especificos', ObjetivoEspecificoProyectoViewSet)
-#router.register(r'indicadores-especificos', IndicadorObjEspecProyViewSet)
-#router.register(r'resultados', ResultadoObjEspProyViewSet)
-#router.register(r'indicadores-resultados', IndicadorResultadoProyViewSet)
-#router.register(r'actividades', ActividadBaseResultadoViewSet)
-#router.register(r'lineas-accion', LineaAccionResultadoViewSet)
 
 
 # URL patterns adicionales que no son ViewSets
@@ -65,6 +52,19 @@ urlpatterns = [
     path(r'diagramas/<int:pk>/actualizar/', DiagramaEstructuraUpdateView.as_view(), name='actualizar-diagrama'),
     path(r'proyecto/<int:pk>/estructura/', ProyectoDetalladoView.as_view(), name='proyecto-id-estructura' ),
     path(r'proyectos-planificacion/', ProyectosPlanificacionList.as_view(), name='proyecto-planificacion' ),
+    path(r'proyecto/<int:proyecto_id>/conteos/', conteos_proyecto, name="conteos-proyecto"),
+    path(r'proyectos/<int:proyecto_id>/procesos/', ProcesosPorProyectoListView.as_view(), name='procesos-por-proyecto'),
+    path(r'pei/<int:pei_id>/listobj/', SimpleObjetivosPeiListView.as_view(), name='objetivos-pei-list'),
+    path(r'objetivos/<int:objetivo_id>/indicadores-compactos/',  IndicadoresCompactosView.as_view(), name='indicadores-compactos'),
+    path(r'proyectos/<int:proyecto_id>/indicadores-og/', IndicadoresObjetivoGeneralView.as_view(),  name='indicadores-og'),
+    path(r'proyectos/<int:proyecto_id>/objetivos-especificos/', ObjetivosEspecificosCombinadosView.as_view(),  name='objetivos-especificos-lista'),
+    path(r'objetivos-especificos/<int:objetivo_id>/indicadores/', indicadores_objetivo_especifico, name='indicadores_objetivo_especifico'),
+    path(r'objetivos-especificos/<int:oe_id>/productos/', productos_objetivo_especifico, name='productos_objetivo_especifico'),
+    path(r'objetivos-especificos/<int:oe_id>/resultados/', resultados_objetivo_especifico, name='resultados_objetivo_especifico'),
+    path(r'resultados-oe/<int:resultado_id>/indicadores/', indicadores_resultado_oe, name='indicadores_resultado_oe'),
+    path(r'proyectos/<int:proyecto_id>/actividades/', ActividadesProyectoDropdownList.as_view(), name='actividades-proyecto' ),
+    path(r'proyectos/<int:proyecto_id>/resultados-og/', ResultadosOGDropdownList.as_view(), name='resultados-og-dropdown'),
+    path(r'resultados-og/<int:resultado_og_id>/indicadores/', IndicadoresResultadoOGDropdownList.as_view(), name='indicadores-resultado-og-dropdown'),
     path(r'test/', test_endpoint, name='test-endpoint'),    
 ]
 

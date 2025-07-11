@@ -175,6 +175,7 @@ class Proyecto(models.Model):
     ESTADO_OPCIONES = [
         ('ES','Estructuracion'),
         ('EP','En Planificacion'),
+        ('PL','Planificado'),
     ]
 
     #Informacion basica
@@ -347,7 +348,7 @@ class ResultadoOE(ResultadoProyecto):
 # Producto
 class ProductoProyecto(PolymorphicModel):
     codigo = models.CharField(max_length=50, null=True, blank=True)
-    descripcion = models.TextField(blank=True, null=True), 
+    descripcion = models.TextField(blank=True, null=True)
     supuestos = models.TextField(blank=True, null=True)
     riesgos = models.TextField(blank=True, null=True)
     entregado = models.BooleanField(default=False)
