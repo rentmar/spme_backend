@@ -13,7 +13,6 @@ router.register(r'indicadores-cualitativos', IndicadorPeiCualitativoViewSet)
 router.register(r'factores-criticos', FactoresCriticosView, basename='factores_criticos')
 
 
-
 #PROYECTOS
 router.register(r'proyectos', ProyectoViewModel, basename='proyectos')
 #Proyectos - Diagrama
@@ -65,6 +64,9 @@ urlpatterns = [
     path(r'proyectos/<int:proyecto_id>/actividades/', ActividadesProyectoDropdownList.as_view(), name='actividades-proyecto' ),
     path(r'proyectos/<int:proyecto_id>/resultados-og/', ResultadosOGDropdownList.as_view(), name='resultados-og-dropdown'),
     path(r'resultados-og/<int:resultado_og_id>/indicadores/', IndicadoresResultadoOGDropdownList.as_view(), name='indicadores-resultado-og-dropdown'),
+    path(r'proyectos/<int:proyecto_id>/indicadores-og/count/', count_indicadores_og, name='count-indicadores-og'),    
+    path(r'proyectos/<int:proyecto_id>/resultados-og/count/', count_resultados_og, name='count-resultados-og'),
+    path(r'proyectos/<int:proyecto_id>/column-stats/', ColumnVisibilityStatsView.as_view(), name='column-stats'),
     path(r'test/', test_endpoint, name='test-endpoint'),    
 ]
 

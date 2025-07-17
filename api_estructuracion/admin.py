@@ -67,5 +67,3 @@ class IndicadorObjetivoEspecificoAdmin(PolymorphicChildModelAdmin):
 class IndicadorResultadoObjEspecificoAdmin(PolymorphicChildModelAdmin):
     base_model=IndicadorProyecto
 
-
-    

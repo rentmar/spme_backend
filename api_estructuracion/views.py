@@ -801,7 +801,54 @@ class IndicadoresResultadoOGDropdownList(generics.ListAPIView):
                 'message': str(e)
             }, status=400)
 
+######## CONTEOS #################
+@api_view(['GET'])
+def count_indicadores_og(request, proyecto_id):
+    """
+    Retorna el conteo de indicadores de objetivo general para un proyecto
+    Ejemplo de respuesta: {"count": 3}
+    """
+    proyecto = get_object_or_404(Proyecto, pk=proyecto_id)
+    count = IndicadorObjetivoGeneral.objects.filter(
+        objetivo_general__proyecto=proyecto
+    ).count()
+    
+    return Response({"count": count})
 
+
+@api_view(['GET'])
+def count_resultados_og(request, proyecto_id):
+    """
+    Retorna el conteo de resultados de objetivo general para un proyecto
+    Ejemplo de respuesta: {"count": 2}
+    """
+    proyecto = get_object_or_404(Proyecto, pk=proyecto_id)
+    count = ResultadoOG.objects.filter(
+        objetivo_general__proyecto=proyecto
+    ).count()
+    
+    return Response({"count": count})
+
+######## CONTEOS FIN  ############
+
+class ColumnVisibilityStatsView(APIView):
+    def get(self, request, proyecto_id):
+        proyecto = get_object_or_404(Proyecto, pk=proyecto_id)
+        objetivo_general = getattr(proyecto, 'objetivo_general', None)
+       
+        return Response({
+            'indicadores_pei': IndicadorPeiBase.objects.filter(objetivo__pei=proyecto.pei).count(),
+            'indicadores_og': IndicadorObjetivoGeneral.objects.filter(objetivo_general__proyecto=proyecto).count(),
+            'resultados_og': ResultadoOG.objects.filter(objetivo_general__proyecto=proyecto).count(),
+            'objetivos_especificos': ObjetivoEspecificoProyecto.objects.filter(
+                Q(proyecto=proyecto) | Q(objetivo_general=objetivo_general)
+            ).distinct().count(),
+            'indicadores_oe': IndicadorObjetivoEspecifico.objects.filter(objetivo_especifico__proyecto=proyecto).count(),
+            'resultados_oe': ResultadoOE.objects.filter(objetivo_especifico__proyecto=proyecto).count(),
+            'productos_oe': ProductoOE.objects.filter(objetivo_especifico__proyecto=proyecto).count(),
+            'tiene_instancias_gestoras': proyecto.instancia_gestora.exists(),
+            'tiene_procedencia_fondos': proyecto.procedencia_fondos.exists()
+        })
 
 
 
