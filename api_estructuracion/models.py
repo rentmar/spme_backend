@@ -408,7 +408,8 @@ class IndicadorProyecto(PolymorphicModel):
         ('1-9', 'Numerico'),
         ('%', 'Porcentual')
     ]
-
+    descripcion = models.TextField(null=True, blank=True)
+    definicion  = models.TextField(null=True, blank=True)
     # Campos comunes a todos los indicadores
     codigo = models.CharField(max_length=50, null=True, blank=True)
     redaccion = models.CharField(max_length=5, choices=TIPO_INDICADOR, blank=True, null=True)
@@ -433,11 +434,6 @@ class IndicadorProyecto(PolymorphicModel):
         null=True,
     )
     target_q3 = models.CharField(
-        max_length=10,
-        blank=True, 
-        null=True,
-    )
-    target_q4 = models.CharField(
         max_length=10,
         blank=True, 
         null=True,
