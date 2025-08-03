@@ -465,8 +465,6 @@ class PeiEstructuraSerializer(serializers.ModelSerializer):
 
 ################################CONTEOS#########################################################################
 
-#Serializador para el conteo de los proyectos
-from rest_framework import serializers
 
 class ConteosProyectoSerializer(serializers.Serializer):
     # Objetivo General y sus elementos

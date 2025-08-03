@@ -841,11 +841,27 @@ class ColumnVisibilityStatsView(APIView):
             'indicadores_og': IndicadorObjetivoGeneral.objects.filter(objetivo_general__proyecto=proyecto).count(),
             'resultados_og': ResultadoOG.objects.filter(objetivo_general__proyecto=proyecto).count(),
             'objetivos_especificos': ObjetivoEspecificoProyecto.objects.filter(
-                Q(proyecto=proyecto) | Q(objetivo_general=objetivo_general)
+                 Q(proyecto=proyecto) | Q(objetivo_general__proyecto=proyecto)
+             ).distinct().count(),
+            # Anterior Consulta
+            # 'objetivos_especificos': ObjetivoEspecificoProyecto.objects.filter(
+            #     Q(proyecto=proyecto) | Q(objetivo_general__proyecto=objetivo_general)
+            # ).distinct().count(),
+            #'indicadores_oe': IndicadorObjetivoEspecifico.objects.filter(objetivo_especifico__proyecto=proyecto).count(),
+            'indicadores_oe': IndicadorObjetivoEspecifico.objects.filter(
+                Q(objetivo_especifico__proyecto_id=proyecto_id)|
+                Q(objetivo_especifico__objetivo_general__proyecto_id=proyecto_id)
+            ).count(),
+            #'resultados_oe': ResultadoOE.objects.filter(objetivo_especifico__proyecto=proyecto).count(),
+            'resultados_oe': ResultadoOE.objects.filter(
+                Q(objetivo_especifico__proyecto_id=proyecto_id)|
+                Q(objetivo_especifico__objetivo_general__proyecto_id=proyecto_id)
             ).distinct().count(),
-            'indicadores_oe': IndicadorObjetivoEspecifico.objects.filter(objetivo_especifico__proyecto=proyecto).count(),
-            'resultados_oe': ResultadoOE.objects.filter(objetivo_especifico__proyecto=proyecto).count(),
-            'productos_oe': ProductoOE.objects.filter(objetivo_especifico__proyecto=proyecto).count(),
+            #'productos_oe': ProductoOE.objects.filter(objetivo_especifico__proyecto=proyecto).count(),
+            'productos_oe': ProductoOE.objects.filter(
+                Q(objetivo_especifico__proyecto_id=proyecto_id)|
+                Q(objetivo_especifico__objetivo_general__proyecto_id=proyecto_id)
+            ).count(),
             'tiene_instancias_gestoras': proyecto.instancia_gestora.exists(),
             'tiene_procedencia_fondos': proyecto.procedencia_fondos.exists()
         })
